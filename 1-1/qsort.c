@@ -56,7 +56,7 @@ struct list_head *select_pivot(struct list_head *L){
     struct list_head *pivot = L->next;
     int listsize = list_length(L);
     int rnum = rand();
-    for (int i = 0; i < (rnum % (listsize-1)); i++)
+    for (int i = 0; i < (rnum % listsize); i++)
         pivot = pivot->next;
     return pivot;
 }

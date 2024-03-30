@@ -56,14 +56,14 @@ int main(int argc, char **argv)
     INIT_LIST_HEAD(&list);
     struct list_head *head = &list;
 
-    size_t count = 100000;
+    size_t count = 10000;
 
     int *test_arr = malloc(sizeof(int) * count);
 
     for (int i = 0; i < count; ++i)
         test_arr[i] = i;
     
-    shuffle(test_arr, count);
+    // shuffle(test_arr, count);
 
     while (count--)
         head = list_construct(head, test_arr[count]);
