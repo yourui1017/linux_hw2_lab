@@ -1,10 +1,10 @@
 CC = gcc
 CFLAGS = -O1 -g -Wall -Werror -Idudect -I.
 
-CFILES = main.c qsort.c
+CFILES = main.c qsort.c random.c
 
 main: $(CFILES)
-	$(CC) $^ -o $@ $(CFLAG)
+	$(CC) $^ -o $@ $(CFLAGS)
 
 clean:
-	rm -f q_sort
+	rm -f main

@@ -1,87 +1,115 @@
 #include "qsort.h"
 
-void list_add(node_t **list, node_t *node_t)
+struct list_head *list_new()
 {
-    node_t->next = *list;
-    *list = node_t;
+    struct list_head *head = malloc(sizeof(struct list_head));
+    if (!head)
+        return NULL;
+    INIT_LIST_HEAD(head);
+    return head;
 }
 
-node_t *list_tail(node_t **left)
+struct list_head *list_tail(struct list_head *head)
 {
-    while ((*left) && (*left)->next)
-        left = &((*left)->next);
-    return *left;
+    return head->prev;
 }
 
-int list_length(node_t **left)
+int list_length(struct list_head *head)
 {
-    int n = 0;
-    while (*left) {
-        ++n;
-        left = &((*left)->next);
-    }
-    return n;
+    if (!head)
+        return 0;
+
+    int count = 0;
+    struct list_head *node;
+
+    list_for_each (node, head)
+        count++;
+
+    return count;
 }
 
-node_t *list_construct(node_t *list, int n)
+
+struct list_head *list_construct(struct list_head *head, int n)
 {
-    node_t *node = malloc(sizeof(node_t));
-    node->next = list;
-    node->value = n;
-    return node;
+    element_t *node = malloc(sizeof(element_t)); 
+    list_add(&node->list, head);
+    char buf[20];
+    sprintf(buf, "%d", n);
+    node->value = buf;
+    return head;
 }
 
-void list_free(node_t **list)
+
+void list_free(struct list_head *head)
 {
-    node_t *node = (*list)->next;
-    while (*list) {
-        free(*list);
-        *list = node;
-        if (node)
-            node = node->next;
-    }
+    if (!head)
+        return;
+
+    element_t *safe, *node;
+    list_for_each_entry_safe(node, safe, head, list) 
+        free(node);
+
+    free(head);
 }
 
-void quick_sort(node_t **list)
+struct list_head *select_pivot(struct list_head *L){
+    struct list_head *pivot = L->next;
+    int listsize = list_length(L);
+    int rnum = rand();
+    for (int i = 0; i < (rnum % (listsize-1)); i++)
+        pivot = pivot->next;
+    return pivot;
+}
+
+void quick_sort(struct list_head *head)
 {
-    int n = list_length(list);
-    int value;
+    if (!head || list_empty(head))
+        return;
+    int n = list_length(head);
     int i = 0;
-    int max_level = 2 * n;
-    node_t *begin[max_level], *end[max_level];
-    node_t *result = NULL, *left = NULL, *right = NULL;
+    int max_level = 1 * n+1;
+    struct list_head *begin[max_level];
+    struct list_head *result = list_new(), *left = list_new(), *right = list_new();
     
-    begin[0] = *list;
-    end[0] = list_tail(list);
-            
+    begin[0] = head;
+    for(int i = 1; i < max_level; i++) {
+        begin[i] = list_new();
+    }
+
     while (i >= 0) {
-        node_t *L = begin[i], *R = end[i];
-        if (L != R) {
-            node_t *pivot = L;
-            value = pivot->value;
-            node_t *p = pivot->next;
-            pivot->next = NULL;
-    
-            while (p) {
-                node_t *n = p;
-                p = p->next;
-                list_add(n->value > value ? &right : &left, n);
+        struct list_head *L = begin[i], *R = list_tail(begin[i]);
+        if (L->next != R) {
+            
+            // struct list_head *pivot = L->next;
+            // element_t *pivot_entry = list_entry(pivot, element_t, list);
+            // list_del_init(pivot);
+
+            struct list_head *pivot = select_pivot(L);
+            element_t *pivot_entry = list_entry(pivot, element_t, list);
+            list_del_init(pivot);
+
+            element_t *entry, *safe;
+            list_for_each_entry_safe(entry, safe, L, list){
+                list_move(&entry->list, ((strcmp(entry->value, pivot_entry->value) > 0) ? right : left));
             }
 
-            begin[i] = left;
-            end[i] = list_tail(&left);
-            begin[i + 1] = pivot;
-            end[i + 1] = pivot;
-            begin[i + 2] = right;
-            end[i + 2] = list_tail(&right);
+            list_splice_init(left, begin[i]);
+            list_add(pivot,begin[i + 1]);
+            list_splice_init(right, begin[i+2]);
 
-            left = right = NULL;
             i += 2;
         } else {
-            if (L)
-                list_add(&result, L);
+            if (!list_empty(L)) 
+                list_move(L->next, result);
             i--;
         }
     }
-    *list = result;
+    list_splice_init(result, head);
+    free(result);
+
+    for(int j=1 ; j<max_level ; j++){
+        free(begin[j]);
+    }
+    free(right);
+    free(left);
 }
