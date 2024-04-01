@@ -5,6 +5,7 @@
 
 #include "list.h"
 #include "timsort.h"
+#include "insertion_sort.h"
 
 typedef struct {
     struct list_head list;
@@ -106,7 +107,8 @@ int main(void)
     srand((uintptr_t) &main);
 
     test_t tests[] = {
-        {.name = "timesort", .impl = timsort},
+        // {.name = "timesort", .impl = timsort},
+        {.name = "insertionsort", .impl = insertionsort},
         {NULL, NULL},
     };
     test_t *test = tests;
@@ -133,7 +135,7 @@ int main(void)
         test->impl(&count, &testdata_head, compare);
         printf("  Comparisons:    %d\n", count);
         printf("  List is %s\n",
-               check_list(&testdata_head, nums) ? "sorted" : "not sorted");
+        check_list(&testdata_head, nums) ? "sorted" : "not sorted");
         test++;
     }
 
