@@ -13,7 +13,7 @@ typedef struct {
     int seq;
 } element_t;
 
-#define SAMPLES 1000
+#define SAMPLES 1000000
 
 static void create_sample(struct list_head *head, element_t *space, int samples)
 {
@@ -107,8 +107,8 @@ int main(void)
     srand((uintptr_t) &main);
 
     test_t tests[] = {
-        // {.name = "timesort", .impl = timsort},
-        {.name = "insertionsort", .impl = insertionsort},
+        {.name = "timesort", .impl = timsort},
+        // {.name = "insertionsort", .impl = insertionsort},
         {NULL, NULL},
     };
     test_t *test = tests;

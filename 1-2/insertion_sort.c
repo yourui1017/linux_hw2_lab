@@ -3,12 +3,12 @@
 
 void insertionsort(void *priv, struct list_head *head, list_cmp_func_t cmp)
 {
-    if (!head || list_empty(head) || list_is_singular(head))
+    if (!head || list_empty(head))
         return;
         
-    struct list_head *cur = head->next, *next = cur->next, **ptr = &head->next;
+    struct list_head *cur = head->next, *next = cur->next, **ptr = &head;
     
-    for(; next != head;){
+    for(; next != head; next = cur->next){
         if (cmp(priv, cur, next) > 0){
             do {
                 if (cmp(priv, *ptr, next) > 0) 
@@ -16,11 +16,9 @@ void insertionsort(void *priv, struct list_head *head, list_cmp_func_t cmp)
                 else
                     ptr = &(*ptr)->next;
             } while(*ptr != next);
-            next = cur->next;
-            ptr = &head->next;
-        } else {
+            ptr = &head;
+        } else 
             cur = next;
-            next = cur->next;
-        }
+        
     }
 }

@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "list.h": "c"
+        "list.h": "c",
+        "qsort.h": "c",
+        "insertion_sort.h": "c"
     }
 }
